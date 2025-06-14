@@ -1,0 +1,60 @@
+description: "TDS Virtual TA Evaluation (Sample Questions)"
+
+providers:
+  - id: tds-api
+    config:
+      url: "https://your-api-url.onrender.com/api/"  # ← REPLACE THIS
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      body: |
+        {
+          "question": "{{question}}",
+          "image": "{{image}}"
+        }
+      timeout: 30000
+
+tests:
+  # Example test with image reference (won't actually process the image)
+  - vars:
+      question: "Sample question about token costs (see image)"
+      image: file://image.png  # Reference only
+    assert:
+      - type: llm-rubric
+        value: The answer should demonstrate cost calculation methodology
+      - type: contains
+        transform: output.answer
+        value: "cost per million tokens"
+
+  # Real functional tests
+  - vars:
+      question: "Should I use gpt-4o-mini or gpt-3.5-turbo for assignments?"
+    assert:
+      - type: equals
+        transform: output.answer
+        value: "You must use gpt-3.5-turbo-0125 as specified in the course requirements"
+      - type: contains
+        transform: JSON.stringify(output.links)
+        value: "ga5-question-8-clarification"
+
+defaultTest:
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [answer, links]
+        properties:
+          answer: { type: string }
+          links:
+            type: array
+            items:
+              type: object
+              required: [url, text]
+              properties:
+                url: { type: string }
+                text: { type: string }
+    - type: javascript
+      value: response.time < 30000
+
+commandLineOptions:
+  cache: true
