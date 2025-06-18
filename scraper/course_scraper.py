@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 
 BASE_URL = "https://tds.s-anand.net/#/2025-01/"
 BASE_ORIGIN = "https://tds.s-anand.net"
-OUTPUT_JSON = "app/data/course_content.json"
+OUTPUT_JSON = "data/course_content.json"
 
 visited = set()
 collected_data = []
